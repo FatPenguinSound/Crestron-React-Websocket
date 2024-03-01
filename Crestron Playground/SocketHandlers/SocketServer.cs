@@ -91,7 +91,6 @@ namespace Crestron_Playground.SocketHandlers
 
         public void Send(string data)
         {
-            CrestronConsole.PrintLine("Sending to client: {0}", data);
             server.WebSocketServices["/app"].Sessions.Broadcast(data);
         }
 
@@ -165,27 +164,27 @@ namespace Crestron_Playground.SocketHandlers
         protected override void OnOpen()
         {
             base.OnOpen();
-            CrestronConsole.PrintLine("Client connected");
+            ErrorLog.Notice("Client connected to web server.");
         }
 
         protected override void OnMessage(MessageEventArgs e)
         {
             base.OnMessage(e);
-            CrestronConsole.PrintLine("Message recieved from client: {0}", e.RawData);
             NewMessageReceived?.Invoke(e.Data);
         }
 
         protected override void OnError(ErrorEventArgs e)
         {
             base.OnError(e);
-            CrestronConsole.PrintLine("The server has encountered exception {0} with message: {1}", e.Exception, e.Message);
-            ErrorLog.Error("Server encountered and error: {0}", e.Message);
+            //CrestronConsole.PrintLine("The server has encountered exception {0} with message: {1}", e.Exception, e.Message);
+            ErrorLog.Error("Server encountered exception {0} with message: {1}", e.Exception, e.Message);
         }
 
         protected override void OnClose(CloseEventArgs e)
         {
             base.OnClose(e);
-            CrestronConsole.PrintLine("Server socket closed with code: {0}", e.Code.ToString());
+            CrestronConsole.PrintLine("Server socket closed with code: {0}", e.Code);
+            ErrorLog.Notice("Client disconnected with code {0}", e.Code);
         }
 
         public event NewMessage NewMessageReceived;
