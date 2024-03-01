@@ -1,4 +1,4 @@
-﻿using Crestron_Playground.SocketHandlers;
+﻿using Crestron_Websocket_Server.SocketHandlers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Crestron.SimplSharp;
 using Crestron.SimplSharpPro.UI.DVPHD;
 
-namespace Crestron_Playground
+namespace Crestron_Websocket_Server
 {
     /// <summary>
     /// This class handles the actual program logic for the system.

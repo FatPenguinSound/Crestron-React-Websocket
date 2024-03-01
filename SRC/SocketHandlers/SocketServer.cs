@@ -11,7 +11,7 @@ using WebSocketSharp;
 
 using WebSocketSharp.Server;
 
-namespace Crestron_Playground.SocketHandlers
+namespace Crestron_Websocket_Server.SocketHandlers
 {
     /// <summary>
     /// This class wraps the WebSocketServer with some added functionallity for interactivity with the rest of the program. Received messages are queued into a buffer that can be accessed outside of the class instance. Subscribe to changes in the buffer using the propertychanged event handler.
