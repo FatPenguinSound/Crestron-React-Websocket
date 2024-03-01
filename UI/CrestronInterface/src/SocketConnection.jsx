@@ -5,11 +5,9 @@ function SocketConnection(){
     let url = `ws://${address}:5000/app`
     const rws = new ReconnectingWebSocket(url, [], {debug: false, startClosed: true});
 
-    rws.reconnect();
-
     rws.addEventListener('open', () => {
     console.log("Connected to server.");
-    rws.send("Hello server.");
+    //rws.send("Hello server.");
     });
 
     rws.addEventListener('close', () => {
@@ -20,7 +18,7 @@ function SocketConnection(){
     console.log("Error on socket.");
     });
 
-    rws.send("Meow")
+    rws.reconnect();
 
     return rws;
 }

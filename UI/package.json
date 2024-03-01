@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "lodash": "^4.17.21",
     "reconnecting-websocket": "^4.4.0"
   }
 }

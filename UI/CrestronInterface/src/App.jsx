@@ -1,23 +1,47 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import './App.css'
 import SocketConnection from './SocketConnection';
-import ReconnectingWebSocket from 'reconnecting-websocket';
 import { Slider, sliderClasses } from '@mui/base'
+import _ from 'lodash'
+
+let socket = null;
 
 function App() {
-  const socket = useRef(SocketConnection());
+  const [colour, setColour] = useState("rgb(100, 100, 100)");
+
+  useEffect(() => {
+    socket = SocketConnection();
+    socket.addEventListener('message', (event) => {
+      console.log("Message from server.", event.data)
+      const msg = JSON.parse(event.data);
+      const newColour = `rgb(${msg.Value})`
+      console.log(`New colour: ${newColour}`);
+      setColour(newColour);
+    });
+
+    socket.reconnect();
+
+    return () => {
+      socket.close();
+    }
+
+
+  }, [])
+
 
   const Buttons = () => {
     const b = [];
     for(let i = 1; i < 4; i++)
     {
-      b.push(<Button key={i} onPress={(num) => { socket.current.send(`Button: ${num}`) }} id={i}>Button {i}</Button>);
+      b.push(<Button key={i} onPress={_.debounce((num) => { 
+       socket.send(JSON.stringify({Control: "Button", Value: num}))}, 150)
+      } id={i}>Button {i}</Button>);
     }
     return b;
   }
 
   return (
-    <div className='Content'>
+    <div className='Content' style={{backgroundColor: colour}}>
       <h1>Crestron Websocket Test Framework</h1>
       <div className='Buttons'>
         {Buttons()}
@@ -31,7 +55,7 @@ function App() {
           thumb: { className: 'Slider-thumb' },
         }}
         defaultValue={50}
-        onChange={(e, val) => { socket.current.send(`Slider: ${val}`); }}
+        onChange={(e, val) => { socket.send(JSON.stringify({Control: "Slider", Value: val})); }}
       />
       </div>
     </div>
@@ -46,7 +70,7 @@ function Button({id, onPress, children}){
 }
 
 function onButtonPress(btn){
-  console.log(`Button ${btn} has been pressed.`);  
+  //console.log(`Button ${btn} has been pressed.`);  
 }
 
 export default App;

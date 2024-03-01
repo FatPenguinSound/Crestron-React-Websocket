@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using WebSocketSharp;
 
 using WebSocketSharp.Server;
@@ -33,13 +34,13 @@ namespace Crestron_Playground.SocketHandlers
         /// <summary>
         /// The message queue. Access items in the FIFO queue using the public Buffer property.
         /// </summary>
-        private Queue<byte[]> _buffer = new Queue<byte[]>();
+        private Queue<string> _buffer = new Queue<string>();
 
         /// <summary>
         /// The public buffer property. Provides access to a FIFO queue. Access the buffer with a byte array to either add or get and item from the queue.
         /// </summary>
         /// <remarks>Getting an item from the buffer will remove it from the queue.</remarks>
-        public byte[] Buffer
+        public string Buffer
         {
             get {  return _buffer.Dequeue(); }
             private set { 
@@ -71,16 +72,14 @@ namespace Crestron_Playground.SocketHandlers
                 server.AddWebSocketService<ServerOperations>("/app", () =>
                 {
                     var ws = new ServerOperations();
+                    ws.NewMessageReceived += (string msg) => { Buffer = msg; };
                     return ws;
                 });
 
-                CrestronConsole.PrintLine("Starting the webserver...");
                 server.Start();
-                CrestronConsole.PrintLine("Webserver started.");
             }
             catch (Exception ex)
             {
-                CrestronConsole.PrintLine("Exception when creating server", ex.Message);
                 ErrorLog.Exception("Exception thrown when creating server.", ex);
             }
 
@@ -90,6 +89,11 @@ namespace Crestron_Playground.SocketHandlers
 
         #region METHODS
 
+        public void Send(string data)
+        {
+            CrestronConsole.PrintLine("Sending to client: {0}", data);
+            server.WebSocketServices["/app"].Sessions.Broadcast(data);
+        }
 
         #endregion
 
@@ -101,6 +105,21 @@ namespace Crestron_Playground.SocketHandlers
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        // TODO: remove buffer and transition to events.
+
+        /*
+        public delegate void ServerMessageReceivedEventHandler(object sender, ServerMessageReceivedEventArgs e);
+
+        public event ServerMessageReceivedEventHandler ServerMessageReceived;
+
+        protected virtual void OnServerMessageReceived(string ip, string message)
+        {
+            ServerMessageReceivedEventArgs args = new ServerMessageReceivedEventArgs(ip, message);
+            ServerMessageReceived?.Invoke(this, args);
+        }
+        */
+
 
         #endregion
 
@@ -152,13 +171,14 @@ namespace Crestron_Playground.SocketHandlers
         protected override void OnMessage(MessageEventArgs e)
         {
             base.OnMessage(e);
-            CrestronConsole.PrintLine("Message recieved from client: {0}", e.Data);
+            CrestronConsole.PrintLine("Message recieved from client: {0}", e.RawData);
+            NewMessageReceived?.Invoke(e.Data);
         }
 
         protected override void OnError(ErrorEventArgs e)
         {
             base.OnError(e);
-            CrestronConsole.PrintLine("Error in the server: {0}", e.Message);
+            CrestronConsole.PrintLine("The server has encountered exception {0} with message: {1}", e.Exception, e.Message);
             ErrorLog.Error("Server encountered and error: {0}", e.Message);
         }
 
@@ -168,6 +188,21 @@ namespace Crestron_Playground.SocketHandlers
             CrestronConsole.PrintLine("Server socket closed with code: {0}", e.Code.ToString());
         }
 
+        public event NewMessage NewMessageReceived;
 
+    }
+
+    public delegate void NewMessage(string message);
+
+    public class ServerMessageReceivedEventArgs : EventArgs
+    {
+        public string ClientIP { get; private set; }
+        public string Message { get; private set; }
+
+        public ServerMessageReceivedEventArgs(string clientIP, string data)
+        {
+            ClientIP = clientIP;
+            Message = data;
+        }
     }
 }
