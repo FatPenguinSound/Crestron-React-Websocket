@@ -1,14 +1,17 @@
+import { useRef } from 'react';
 import './App.css'
 import SocketConnection from './SocketConnection';
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import { Slider, sliderClasses } from '@mui/base'
 
 function App() {
-  const socket = SocketConnection();
+  const socket = useRef(SocketConnection());
 
   const Buttons = () => {
     const b = [];
     for(let i = 1; i < 4; i++)
     {
-      b.push(<Button key={i} id={i}>Button {i}</Button>);
+      b.push(<Button key={i} onPress={(num) => { socket.current.send(`Button: ${num}`) }} id={i}>Button {i}</Button>);
     }
     return b;
   }
@@ -20,21 +23,30 @@ function App() {
         {Buttons()}
       </div>
       <div className='Sliders'>
-        <input type='range' min={1} max={100} defaultValue={50} className='Slider'/>
+      <Slider
+        slotProps={{
+          root: { className: 'Slider' },
+          rail: { className: 'Slider-rail' },
+          track: { className: 'Slider-track' },
+          thumb: { className: 'Slider-thumb' },
+        }}
+        defaultValue={50}
+        onChange={(e, val) => { socket.current.send(`Slider: ${val}`); }}
+      />
       </div>
     </div>
   )
 }
 
-function Button({id, children}){
+function Button({id, onPress, children}){
   const num = id;
   return (
-    <button className='Button' onClick={() => onButtonPress(num)}>{children}</button>
+    <button className='Button' onClick={() => {onButtonPress(num); onPress(num);}}>{children}</button>
   )
 }
 
 function onButtonPress(btn){
-  console.log(`Button ${btn} has been pressed.`);
+  console.log(`Button ${btn} has been pressed.`);  
 }
 
 export default App;

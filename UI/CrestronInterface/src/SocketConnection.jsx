@@ -19,6 +19,10 @@ function SocketConnection(){
     rws.addEventListener('error', () => {
     console.log("Error on socket.");
     });
+
+    rws.send("Meow")
+
+    return rws;
 }
 
 export default SocketConnection;
