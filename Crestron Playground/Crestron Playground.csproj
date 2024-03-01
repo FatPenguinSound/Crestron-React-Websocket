@@ -143,7 +143,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlSystem.cs" />
+    <Compile Include="ProgramLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SocketHandlers\SocketServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

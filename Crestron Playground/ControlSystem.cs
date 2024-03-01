@@ -9,6 +9,8 @@ namespace Crestron_Playground
 {
     public class ControlSystem : CrestronControlSystem
     {
+        internal ProgramLogic programLogic;
+
         /// <summary>
         /// ControlSystem Constructor. Starting point for the SIMPL#Pro program.
         /// Use the constructor to:
@@ -57,7 +59,7 @@ namespace Crestron_Playground
         {
             try
             {
-
+                programLogic = new ProgramLogic();
             }
             catch (Exception e)
             {
@@ -117,6 +119,9 @@ namespace Crestron_Playground
                     //Shutdown all Client/Servers in the system.
                     //General cleanup.
                     //Unsubscribe to all System Monitor events
+
+                    programLogic.Dispose();
+
                     break;
             }
 
