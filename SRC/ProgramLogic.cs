@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Crestron.SimplSharp;
 using Crestron.SimplSharpPro.UI.DVPHD;
+using Crestron.SimplSharpPro.UI;
 
 namespace Crestron_Websocket_Server
 {
@@ -18,16 +19,27 @@ namespace Crestron_Websocket_Server
     {
         private bool _disposed;
         private SocketServer server;
+        private XpanelForHtml5 panel;
 
         private int CurrentColour;
         private int Saturation;
 
-        internal ProgramLogic()
+        internal ProgramLogic(ControlSystem system)
         {
             server = new SocketServer();
             Saturation = 50;
             CurrentColour = 1;
             server.PropertyChanged += OnMessageReceive;
+            panel = new XpanelForHtml5(0x0f, system);
+            CrestronConsole.PrintLine("DEBUG: Registering xpanel...");
+            if(panel.Register() != Crestron.SimplSharpPro.eDeviceRegistrationUnRegistrationResponse.Success)
+            {
+                ErrorLog.Error($"Error registering xpanel {panel.RegistrationFailureReason}");
+            }
+            else
+            {
+                ErrorLog.Notice("Xpanel registered.");
+            }
         }
 
         private void OnMessageReceive(object sender, EventArgs e)

@@ -59,7 +59,7 @@ namespace Crestron_Websocket_Server
         {
             try
             {
-                programLogic = new ProgramLogic();
+                programLogic = new ProgramLogic(this);
             }
             catch (Exception e)
             {

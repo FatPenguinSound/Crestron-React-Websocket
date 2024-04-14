@@ -7,15 +7,22 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "archive": "ch5-cli archive -p crestroninterface -d dist -o archive",
+    "deploy": "ch5-cli deploy -p -t touchscreen dist/crestron-playground-interface.ch5",
+    "build:deployweb": "ch5-cli deploy -H 169.254.245.163 -p -t web archive/crestroninterface.ch5z",
+    "onestep": "npm run build && npm run archive && npm run build:deployweb"
   },
   "dependencies": {
     "@crestron/ch5-crcomlib": "^1.2.0",
     "@crestron/ch5-utilities-cli": "^2.0.0",
+    "@crestron/ch5-webxpanel": "^2.8.0",
     "@mui/base": "^5.0.0-beta.37",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "reconnecting-websocket": "^4.4.0"
+    "reconnecting-websocket": "^4.4.0",
+    "vite-plugin-singlefile": "^2.0.1",
+    "vite-plugin-static-copy": "^1.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",

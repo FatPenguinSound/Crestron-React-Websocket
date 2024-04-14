@@ -1,8 +1,34 @@
+import { WebXPanel, isActive } from "@crestron/ch5-webxpanel";
+import { CrComLib } from "@crestron/ch5-crcomlib/build_bundles/cjs/cr-com-lib";
+
+import {
+  bridgeReceiveIntegerFromNative,
+  bridgeReceiveBooleanFromNative,
+  bridgeReceiveStringFromNative,
+  bridgeReceiveObjectFromNative,
+} from "@crestron/ch5-crcomlib/build_bundles/cjs/cr-com-lib";
+
 import { useRef, useState, useEffect } from 'react';
 import './App.css'
 import SocketConnection from './SocketConnection';
 import { Slider, sliderClasses } from '@mui/base'
 import _ from 'lodash'
+
+const configuration = { 
+  host: 'window.location.host', // defaults to window.location.host 
+  ipId: '0x0f', // string representing a hex value. Might contain "0x" or not. Defaults to "0x03" 
+}; 
+
+if (isActive){ 
+  WebXPanel.initialize(configuration); 
+} 
+
+
+window.CrComLib = CrComLib;
+window["bridgeReceiveIntegerFromNative"] = bridgeReceiveIntegerFromNative;
+window["bridgeReceiveBooleanFromNative"] = bridgeReceiveBooleanFromNative;
+window["bridgeReceiveStringFromNative"] = bridgeReceiveStringFromNative;
+window["bridgeReceiveObjectFromNative"] = bridgeReceiveObjectFromNative;
 
 let socket = null;
 
